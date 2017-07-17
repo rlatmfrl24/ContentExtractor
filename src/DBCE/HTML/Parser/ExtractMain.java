@@ -1,8 +1,10 @@
 package DBCE.HTML.Parser;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
@@ -13,6 +15,8 @@ import java.util.Map.Entry;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+
+import DBCE.RepeatMap.RepeatLineMap;
 
 public class ExtractMain extends Thread {
 
@@ -58,7 +62,7 @@ public class ExtractMain extends Thread {
 				DateUtil du = new DateUtil(pi);
 				Date pdate = du.getPageDate();
 				if(pdate!=null) pi.setDate(pdate);
-				pi.setContent(performExtraction(doc));
+				pi.setContent(performExtraction(doc).replaceAll("<[^>]*>", ""));
 				pi.AnalyzeContent();
 				String outpath = output_path+"/"+path_Map.get(input_path_list.get(i));
 				outpath = outpath.substring(0, outpath.lastIndexOf("."))+".txt";
@@ -78,6 +82,7 @@ public class ExtractMain extends Thread {
 			System.out.println("Detect Duplicate files..");
 			DuplicateDetector dd = new DuplicateDetector();
 			dd.FileDuplicationDetector(output_path);
+			refineByRepeatMap(output_path, output_path+"/refine/");
 			
 		}catch(Exception e){
 			e.printStackTrace();
@@ -130,5 +135,53 @@ public class ExtractMain extends Thread {
 		m.ExtractContent(bodyMap, bodyElement, Threshold);
 		
 		return m.getContent();
+	}
+	public static void refineByRepeatMap(String input, String output){
+		RepeatLineMap rlm = new RepeatLineMap();
+		String content = "";
+		String before = "";
+		File output_file = new File(output);
+		if(!output_file.exists()){
+			output_file.mkdirs();
+		}
+		
+		try{
+			File f = new File(input);
+			for (File rf : f.listFiles()) {
+				if (rf.isFile()) {
+					BufferedReader br = new BufferedReader(new FileReader(rf));
+					String tmp;
+					while ((tmp = br.readLine()) != null) {
+						content += tmp + "\n";
+					}
+					System.out.println("=> Find Repeat Phreas By "+rf.getName());
+					rlm.UpdateMap(before, content);
+					before = content;
+					content = "";
+					br.close();
+				}
+			}
+			rlm.Resize(5);
+			System.out.println(rlm.getRepeatMap());
+			
+			for (File rf : f.listFiles()) {
+				if (rf.isFile()) {
+					BufferedReader br = new BufferedReader(new FileReader(rf));
+					BufferedWriter bw = new BufferedWriter(new FileWriter(output + rf.getName()));
+					String tmp;
+					while ((tmp = br.readLine()) != null) {
+						content += tmp + "\n";
+					}
+					System.out.println(rf.getName());
+					br.close();
+					bw.write(rlm.refineByMap(content));
+					bw.flush();
+					bw.close();
+					content = "";
+				}
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+		}
 	}
 }
