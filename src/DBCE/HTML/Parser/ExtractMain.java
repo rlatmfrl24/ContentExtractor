@@ -58,7 +58,7 @@ public class ExtractMain extends Thread {
 				DateUtil du = new DateUtil(pi);
 				Date pdate = du.getPageDate();
 				if(pdate!=null) pi.setDate(pdate);
-				pi.setContent(performExtraction(doc));
+				pi.setContent(performExtraction(doc).replaceAll("<[^>]*>", ""));
 				pi.AnalyzeContent();
 				String outpath = output_path+"/"+path_Map.get(input_path_list.get(i));
 				outpath = outpath.substring(0, outpath.lastIndexOf("."))+".txt";
