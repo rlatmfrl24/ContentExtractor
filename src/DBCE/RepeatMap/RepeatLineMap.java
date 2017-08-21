@@ -26,6 +26,7 @@ public class RepeatLineMap {
 	public void UpdateMap(String s1, String s2){
 		
 		diff_match_patch dmp = new diff_match_patch();
+<<<<<<< HEAD
 		dlist = dmp.diff_main(s1.replaceAll("[0-9]", "0"), s2.replaceAll("[0-9]", "0"));
 		dmp.diff_cleanupSemantic(dlist);
 		
@@ -60,6 +61,42 @@ public class RepeatLineMap {
 				res += line+"\n";
 			}else{
 				System.out.println("[Msg]"+line+" Removed!");
+=======
+		dlist = dmp.diff_main(s1, s2);
+		dmp.diff_cleanupSemantic(dlist);
+		
+		LinkedList<Diff> equal_list = new LinkedList<>();
+		for(int i=0; i<dlist.size(); i++){
+			if(dlist.get(i).operation.toString().equals("EQUAL") && dlist.get(i).text.contains("\n")){
+				equal_list.add(dlist.get(i));
+			}
+		}
+		
+		for (int i = 0; i < equal_list.size(); i++) {
+			for (String s : equal_list.get(i).text.trim().split("\n")) {
+				if (s.length() > 5) {
+					if (RepeatMap.containsKey(s)) {
+						RepeatMap.put(s, RepeatMap.get(s) + 1);
+					} else {
+						RepeatMap.put(s, 1);
+					}
+				}
+			}
+		}
+	}
+	
+	public HashMap<String, Integer> getRepeatMap(){
+		return this.RepeatMap;
+	}
+	
+	public String refineByMap(String origin){
+		String res = "";
+		for(String line : origin.split("\n")){
+			if(!RepeatMap.containsKey(line)){
+				res += line+"\n";
+			}else{
+				System.out.println(line);
+>>>>>>> branch 'develop_1' of https://github.com/rlatmfrl24/Extract.git
 			}
 		}
 		return res;
