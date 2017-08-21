@@ -161,7 +161,7 @@ public class ExtractMain extends Thread {
 					br.close();
 				}
 			}
-			rlm.Resize(5);
+			rlm.Resize(2);
 			System.out.println(rlm.getRepeatMap());
 			
 			for (File rf : f.listFiles()) {

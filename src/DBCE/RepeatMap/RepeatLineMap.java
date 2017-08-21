@@ -38,7 +38,7 @@ public class RepeatLineMap {
 		
 		for (int i = 0; i < equal_list.size(); i++) {
 			for (String s : equal_list.get(i).text.trim().split("\n")) {
-				if (s.length() > 5) {
+				if (s.length() > 2) {
 					if (RepeatMap.containsKey(s)) {
 						RepeatMap.put(s, RepeatMap.get(s) + 1);
 					} else {
@@ -56,7 +56,7 @@ public class RepeatLineMap {
 	public String refineByMap(String origin){
 		String res = "";
 		for(String line : origin.split("\n")){
-			if(!RepeatMap.containsKey(line.replaceAll("[0-9]", "0"))){
+			if(!RepeatMap.containsKey(line.replaceAll("[0-9]", "0")) && !line.contains("�")){
 				res += line+"\n";
 			}else{
 				System.out.println("[Msg]"+line+" Removed!");
