@@ -29,9 +29,9 @@ public class ExtractMain extends Thread {
 			System.exit(-1);
 		}
 		
+		int sub_number = 0;
 		HashMap<String, String> path_Map = new HashMap<>();
 		ArrayList<String> input_path_list = new ArrayList<>();
-		int sub_number = 0;
 		for(int i=0; i<args.length-1; i++){
 			File ipfolder = new File(args[i]);
 			for(String str : ipfolder.list()){
