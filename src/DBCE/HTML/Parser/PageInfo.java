@@ -31,7 +31,18 @@ public class PageInfo {
 		return content;
 	}
 	public void setContent(String content) {
-		this.content = content;
+		//Remove Noise
+		String removeRegex1="^[0-9]+.*[0-9]";
+		String removeRegex2="<[^>]*>";
+		String removeRegex3="\\{[^>]*\\}";
+		String removeRegex4="^[0-9]((:|\\)|\\.)|[0-9]+(:|\\)|\\.))";
+		String removeRegex5="^\\{\".*";
+		String process = content.replaceAll(removeRegex1, "");
+		process = process.replaceAll(removeRegex2, "");
+		process = process.replaceAll(removeRegex3, "");
+		process = process.replaceAll(removeRegex4, "");
+		process = process.replaceAll(removeRegex5, "");
+		this.content = process.trim();
 	}
 	public String getUrl() {
 		return url;

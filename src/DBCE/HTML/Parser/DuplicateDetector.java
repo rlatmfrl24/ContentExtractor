@@ -72,9 +72,9 @@ public class DuplicateDetector {
 					count++;
 				}
 			} catch (Exception e) {
-				e.printStackTrace();
+				System.out.println("Maybe This path is directory..");
+				//e.printStackTrace();
 			}
-
 		}
 	}
 

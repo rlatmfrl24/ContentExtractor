@@ -62,7 +62,7 @@ public class ExtractMain extends Thread {
 				DateUtil du = new DateUtil(pi);
 				Date pdate = du.getPageDate();
 				if(pdate!=null) pi.setDate(pdate);
-				pi.setContent(performExtraction(doc).replaceAll("<[^>]*>", ""));
+				pi.setContent(performExtraction(doc));
 				pi.AnalyzeContent();
 				String outpath = output_path+"/"+path_Map.get(input_path_list.get(i));
 				outpath = outpath.substring(0, outpath.lastIndexOf("."))+".txt";
@@ -150,10 +150,12 @@ public class ExtractMain extends Thread {
 			for (File rf : f.listFiles()) {
 				if (rf.isFile()) {
 					BufferedReader br = new BufferedReader(new FileReader(rf));
-					String tmp;
-					while ((tmp = br.readLine()) != null) {
-						content += tmp + "\n";
-					}
+					StringBuilder str = new StringBuilder();
+					char[] c = new char[(int)rf.length()];
+					br.read(c);
+					str.append(c);
+					content = str.toString();
+					br.close();
 					System.out.println("=> Find Repeat Phreas By "+rf.getName());
 					rlm.UpdateMap(before, content);
 					before = content;
@@ -168,11 +170,11 @@ public class ExtractMain extends Thread {
 				if (rf.isFile()) {
 					BufferedReader br = new BufferedReader(new FileReader(rf));
 					BufferedWriter bw = new BufferedWriter(new FileWriter(output + rf.getName()));
-					String tmp;
-					while ((tmp = br.readLine()) != null) {
-						content += tmp + "\n";
-					}
-					System.out.println(rf.getName());
+					StringBuilder str = new StringBuilder();
+					char[] c = new char[(int)rf.length()];
+					br.read(c);
+					str.append(c);
+					content = str.toString();
 					br.close();
 					bw.write(rlm.refineByMap(content));
 					bw.flush();
