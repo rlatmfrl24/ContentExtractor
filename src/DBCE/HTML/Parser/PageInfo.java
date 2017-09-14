@@ -7,6 +7,7 @@ import java.util.Map.Entry;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.mozilla.universalchardet.UniversalDetector;
 
 public class PageInfo {
 
@@ -32,16 +33,21 @@ public class PageInfo {
 	}
 	public void setContent(String content) {
 		//Remove Noise
-		String removeRegex1="^[0-9]+.*[0-9]";
-		String removeRegex2="<[^>]*>";
-		String removeRegex3="\\{[^>]*\\}";
-		String removeRegex4="^[0-9]((:|\\)|\\.)|[0-9]+(:|\\)|\\.))";
+		String removeRegex1="^[0-9]((:|\\)|\\.)|[0-9]+(:|\\)|\\.))";
+		String removeRegex2="^[0-9]+.*[0-9]";
+		String removeRegex3="<[^>]*>";
+		String removeRegex4="\\{[^>]*\\}";
 		String removeRegex5="^\\{\".*";
-		String process = content.replaceAll(removeRegex1, "");
-		process = process.replaceAll(removeRegex2, "");
-		process = process.replaceAll(removeRegex3, "");
-		process = process.replaceAll(removeRegex4, "");
-		process = process.replaceAll(removeRegex5, "");
+		String curline="";
+		String process="";
+		for(String line : content.split("\n")){
+			curline = line.replaceAll(removeRegex1, "");
+			curline = curline.replaceAll(removeRegex2, "");
+			curline = curline.replaceAll(removeRegex3, "");
+			curline = curline.replaceAll(removeRegex4, "");
+			curline = curline.replaceAll(removeRegex5, "");
+			process += curline+"\n";
+		}
 		this.content = process.trim();
 	}
 	public String getUrl() {
@@ -96,21 +102,11 @@ public class PageInfo {
 	}
 	public Document setHTML(String path) {
 		File f = new File(path);
+		String charset = DetectCharset(path);
 		Document doc=null;
-		try {
-			doc = Jsoup.parse(f, "UTF-8");
-			charset = doc.select("meta").attr("charset");
-			if (charset.isEmpty() || charset.contains("/")) {
-				charset = doc.select("meta[http-equiv=\"Content-Type\"]").attr("content");
-				charset = charset.substring(charset.indexOf("=") + 1, charset.length());
-			}
-			if (charset.isEmpty() || charset.contains("/")) {
-				System.out.println("Charset::Default(utf8)");
-				charset = "utf8";
-			}
-			charset = charset.trim();
+		try{
 			doc = Jsoup.parse(f, charset);
-		} catch (Exception e) {
+		}catch(Exception e){
 			e.printStackTrace();
 		}
 		this.doc = doc;
@@ -127,5 +123,29 @@ public class PageInfo {
 	}
 	public void setCharset(String charset) {
 		this.charset = charset;
+	}
+	public static String DetectCharset(String input){
+		String encoding = "";
+		try {
+			byte[] buf = new byte[4096];
+			java.io.FileInputStream fis = new java.io.FileInputStream(input);
+			UniversalDetector detector = new UniversalDetector(null);
+			int nread;
+			while ((nread = fis.read(buf)) > 0 && !detector.isDone()) {
+				detector.handleData(buf, 0, nread);
+			}
+			detector.dataEnd();
+			encoding = detector.getDetectedCharset();
+			if (encoding != null) {
+				System.out.println("Detected encoding = " + encoding);
+			} else {
+				System.out.println("No encoding detected.");
+				encoding = "UTF-8";
+			}
+			detector.reset();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return encoding;
 	}
 }

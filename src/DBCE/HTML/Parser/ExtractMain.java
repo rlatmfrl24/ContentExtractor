@@ -3,9 +3,11 @@ package DBCE.HTML.Parser;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -149,7 +151,7 @@ public class ExtractMain extends Thread {
 			File f = new File(input);
 			for (File rf : f.listFiles()) {
 				if (rf.isFile()) {
-					BufferedReader br = new BufferedReader(new FileReader(rf));
+					BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(rf), StandardCharsets.UTF_8));
 					StringBuilder str = new StringBuilder();
 					char[] c = new char[(int)rf.length()];
 					br.read(c);
@@ -168,8 +170,8 @@ public class ExtractMain extends Thread {
 			
 			for (File rf : f.listFiles()) {
 				if (rf.isFile()) {
-					BufferedReader br = new BufferedReader(new FileReader(rf));
-					BufferedWriter bw = new BufferedWriter(new FileWriter(output + rf.getName()));
+					BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(rf), StandardCharsets.UTF_8));
+					BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(output + rf.getName())), StandardCharsets.UTF_8));
 					StringBuilder str = new StringBuilder();
 					char[] c = new char[(int)rf.length()];
 					br.read(c);
