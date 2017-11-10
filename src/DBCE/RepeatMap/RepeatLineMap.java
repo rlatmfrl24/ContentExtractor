@@ -53,15 +53,29 @@ public class RepeatLineMap {
 		return this.RepeatMap;
 	}
 	
-	public String refineByMap(String origin){
+	public String refineByMap(String origin, boolean reverseOption) {
 		String res = "";
-		for(String line : origin.split("\n")){
-			if(!RepeatMap.containsKey(line.replaceAll("[0-9]", "0")) && !line.contains("�")){
-				res += line+"\n";
-			}else{
-				System.out.println("[Msg]"+line+" Removed!");
+		if (reverseOption) {
+			for (String line : origin.split("\n")) {
+				boolean isCon = true;
+				for(String key : RepeatMap.keySet()){
+					if(line.replaceAll("[0-9]", "0").contains(key.trim())) {
+						System.out.println("[Msg]" + line + " Removed!");
+						isCon=false;
+						break;
+					}
+				}
+				if(isCon) res += line + "\n";
+			}
+		} else {
+			for (String line : origin.split("\n")) {
+				if (!RepeatMap.containsKey(line.replaceAll("[0-9]", "0"))) {
+					res += line + "\n";
+				} else {
+					System.out.println("[Msg]" + line + " Removed!");
+				}
 			}
 		}
-		return res;
+		return res.trim();
 	}
 }

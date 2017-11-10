@@ -5,8 +5,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
@@ -49,9 +47,7 @@ public class ExtractMain extends Thread {
 		if(!ofp.exists()){
 			ofp.mkdirs();
 		}else{
-			for(File oldFile : ofp.listFiles()){
-				oldFile.delete();
-			}
+			subDirList(output_path);
 		}
 		
 		try{
@@ -178,7 +174,8 @@ public class ExtractMain extends Thread {
 					str.append(c);
 					content = str.toString();
 					br.close();
-					bw.write(rlm.refineByMap(content));
+					System.out.println(rf.getName());
+					bw.write(rlm.refineByMap(content, true));
 					bw.flush();
 					bw.close();
 					content = "";
@@ -187,5 +184,24 @@ public class ExtractMain extends Thread {
 		}catch(Exception e){
 			e.printStackTrace();
 		}
+	}
+	public static void subDirList(String source){
+		File dir = new File(source); 
+		File[] fileList = dir.listFiles();
+		
+		try{
+			for(int i = 0 ; i < fileList.length ; i++){
+				File file = fileList[i]; 
+				if(file.isFile()){
+					file.delete();
+				}else if(file.isDirectory()){
+					subDirList(file.getCanonicalPath().toString()); 
+					file.delete();
+				}
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+
 	}
 }

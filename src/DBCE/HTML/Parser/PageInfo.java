@@ -1,6 +1,7 @@
 package DBCE.HTML.Parser;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map.Entry;
@@ -21,6 +22,14 @@ public class PageInfo {
 	private Document doc;
 	private Date date;
 	private HashMap<String, Integer> word_map = new HashMap<String, Integer>();
+	private String[] NoiseRegexSet = {
+			"^[0-9]((:|\\)|\\.)|[0-9]+(:|\\)|\\.))",
+			"^[0-9]+.*[0-9]",
+			"<[^>]*>",
+			"\\{[^>]*\\}",
+			"^\\{\".*",
+			"�"
+	};
 	
 	public String getTitle() {
 		return title;
@@ -33,19 +42,12 @@ public class PageInfo {
 	}
 	public void setContent(String content) {
 		//Remove Noise
-		String removeRegex1="^[0-9]((:|\\)|\\.)|[0-9]+(:|\\)|\\.))";
-		String removeRegex2="^[0-9]+.*[0-9]";
-		String removeRegex3="<[^>]*>";
-		String removeRegex4="\\{[^>]*\\}";
-		String removeRegex5="^\\{\".*";
-		String curline="";
 		String process="";
 		for(String line : content.split("\n")){
-			curline = line.replaceAll(removeRegex1, "");
-			curline = curline.replaceAll(removeRegex2, "");
-			curline = curline.replaceAll(removeRegex3, "");
-			curline = curline.replaceAll(removeRegex4, "");
-			curline = curline.replaceAll(removeRegex5, "");
+			String curline = line;
+			for(String nr : NoiseRegexSet){
+				curline = curline.replaceAll(nr, "");
+			}
 			process += curline+"\n";
 		}
 		this.content = process.trim();
