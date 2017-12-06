@@ -5,6 +5,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
@@ -13,6 +14,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
+import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
@@ -32,6 +34,7 @@ public class ExtractMain extends Thread {
 		int sub_number = 0;
 		HashMap<String, String> path_Map = new HashMap<>();
 		ArrayList<String> input_path_list = new ArrayList<>();
+		
 		for(int i=0; i<args.length-1; i++){
 			File ipfolder = new File(args[i]);
 			for(String str : ipfolder.list()){
@@ -54,6 +57,7 @@ public class ExtractMain extends Thread {
 			
 			for(int i=0; i<input_path_list.size(); i++){				
 				PageInfo pi = new PageInfo();
+				System.out.println(input_path_list.get(i));
 				Document doc = pi.setHTML(input_path_list.get(i));
 				pi.setTitle(doc.title());
 				pi.setUrl(doc.select("link[rel=\"canonical\"]").attr("href"));
@@ -63,6 +67,7 @@ public class ExtractMain extends Thread {
 				pi.setContent(performExtraction(doc));
 				pi.AnalyzeContent();
 				String outpath = output_path+"/"+path_Map.get(input_path_list.get(i));
+				System.out.println(outpath);
 				outpath = outpath.substring(0, outpath.lastIndexOf("."))+".txt";
 				File rf = new File(outpath);
 				while(rf.exists()){

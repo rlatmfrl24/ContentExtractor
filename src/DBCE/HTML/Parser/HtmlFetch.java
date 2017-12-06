@@ -5,6 +5,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 
 public class HtmlFetch {
 	public static String getHttpHTML(String urlToRead, String charset) {
@@ -31,12 +32,13 @@ public class HtmlFetch {
 	public static Document killNoise(Document doc){
 		Document res_doc = doc;
 		//res_doc.select("li").remove();
-		res_doc.select("script").remove();
-		res_doc.select("comment").remove();
-		res_doc.select("style").remove();
-		res_doc.select("iframe").remove();
-		res_doc.select("footer").remove();
-		
+		String[] noise_tags = {"button", "script", "comment", "style", "iframe", "footer", "table"};
+		for(String s : noise_tags){
+			for(Element e : res_doc.select(s)){
+				System.out.println(e);
+				e.remove();
+			}
+		}
 		return res_doc;
 	}	
 }
