@@ -65,6 +65,8 @@ public class ExtractMain extends Thread {
 				Date pdate = du.getPageDate();
 				if(pdate!=null) pi.setDate(pdate);
 				pi.setContent(performExtraction(doc));
+				NoiseController nc = new NoiseController();
+				pi.setContent(nc.refineNoise(pi.getContent(), "ko_kr", true, true, true, true));
 				pi.AnalyzeContent();
 				String outpath = output_path+"/"+path_Map.get(input_path_list.get(i));
 				System.out.println(outpath);

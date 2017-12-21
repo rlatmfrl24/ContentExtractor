@@ -32,13 +32,33 @@ public class HtmlFetch {
 	public static Document killNoise(Document doc){
 		Document res_doc = doc;
 		//res_doc.select("li").remove();
-		String[] noise_tags = {"button", "script", "comment", "style", "iframe", "footer", "table"};
+		String[] noise_tags = {"button", "script", "comment", "style", "iframe", "footer", "label", "li", "em" ,"figcaption", "figure", "img", "option"};
 		for(String s : noise_tags){
-			for(Element e : res_doc.select(s)){
-				System.out.println(e);
-				e.remove();
-			}
+			res_doc.select(s).remove();
 		}
+		
+		for(Element e : res_doc.getAllElements()){
+			if(!e.tagName().equals("html") && !e.tagName().equals("body")){
+				if(e.attr("class").toLowerCase().contains("icon")
+				|| e.attr("class").toLowerCase().contains("footer")
+				|| e.attr("class").toLowerCase().contains("header")
+				|| e.attr("class").toLowerCase().contains("btn")
+				|| e.attr("class").toLowerCase().contains("button")
+				|| e.attr("class").toLowerCase().contains("img")
+				|| e.attr("class").toLowerCase().contains("date")
+				|| e.attr("class").toLowerCase().contains("copyright")
+				|| e.attr("class").toLowerCase().contains("caption")
+				|| e.attr("class").toLowerCase().contains("media")
+				|| e.attr("class").toLowerCase().contains("player")
+				|| e.attr("class").toLowerCase().contains("photo")
+				|| e.attr("class").toLowerCase().contains("option")
+				) {
+					e.remove();
+				}
+			}
+		}		
+		
 		return res_doc;
 	}	
+
 }

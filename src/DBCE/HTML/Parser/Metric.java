@@ -107,18 +107,18 @@ public class Metric {
 	}
 
 	public void ExtractContent(HashMap<Element, TNode> tMap, Element e, float threshold){
-		if(tMap.get(e).getCTD() >= threshold){		
+		if(tMap.get(e).getCTD() >= threshold){	
 			Element check=getMaxDensitySumTag(tMap, e);
-			if(!Content.contains(check.text()) && !check.ownText().isEmpty()) {
-				Content += check.text()+"\n";
+			if(!Content.contains(check.ownText()) && !check.ownText().isEmpty() && !check.tagName().equals("body")) {
+				Content += check.ownText()+"\n";
 				ContentTagCount++;
 			}else{
 				NoiseTagCount++;
 			}
+			
 			for(Element el : e.children()){
 				ExtractContent(tMap, el, threshold);
 			}
-			
 		}
 	}
 }

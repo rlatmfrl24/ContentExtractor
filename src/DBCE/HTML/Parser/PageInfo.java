@@ -24,11 +24,12 @@ public class PageInfo {
 	private HashMap<String, Integer> word_map = new HashMap<String, Integer>();
 	private String[] NoiseRegexSet = {
 			"^[0-9]((:|\\)|\\.)|[0-9]+(:|\\)|\\.))",
-			"^[0-9]+.*[0-9]",
 			"<[^>]*>",
 			"\\{[^>]*\\}",
 			"^\\{\".*",
-			"�"
+			"�",
+			"<.*\b[^>]*>(.*?)</.*>"
+			//"^[0-9]+.*[0-9]",
 	};
 	
 	public String getTitle() {
