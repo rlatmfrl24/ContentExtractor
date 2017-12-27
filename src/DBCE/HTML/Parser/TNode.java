@@ -5,13 +5,13 @@ import org.jsoup.nodes.Element;
 
 public class TNode {
 
-	private float CTD=0;
-	private float DS=0;
-	private float Ci=0;
-	private float Ti=0;
-	private float LCi=0;
-	private float LTi=0;
-	private float NLCi=0;
+	private double CTD=0;
+	private double DS=0;
+	private double Ci=0;
+	private double Ti=0;
+	private double LCi=0;
+	private double LTi=0;
+	private double NLCi=0;
 	ArrayList<String> LinkCharList = new ArrayList<String>();
 	
 	public TNode(){
@@ -31,46 +31,46 @@ public class TNode {
 
 	}
 	
-	public float getCTD() {
+	public double getCTD() {
 		return CTD;
 	}
-	public void setCTD(float cTD) {
+	public void setCTD(double cTD) {
 		CTD = cTD;
 	}
-	public float getDS() {
+	public double getDS() {
 		return DS;
 	}
-	public void setDS(float dS) {
+	public void setDS(double dS) {
 		DS = dS;
 	}
-	public float getCi() {
+	public double getCi() {
 		return Ci;
 	}
-	public void setCi(float ci) {
+	public void setCi(double ci) {
 		Ci = ci;
 	}
-	public float getTi() {
+	public double getTi() {
 		return Ti;
 	}
-	public void setTi(float ti) {
+	public void setTi(double ti) {
 		Ti = ti;
 	}
-	public float getLCi() {
+	public double getLCi() {
 		return LCi;
 	}
-	public void setLCi(float lCi) {
+	public void setLCi(double lCi) {
 		LCi = lCi;
 	}
-	public float getLTi() {
+	public double getLTi() {
 		return LTi;
 	}
-	public void setLTi(float lTi) {
+	public void setLTi(double lTi) {
 		LTi = lTi;
 	}
-	public float getNLCi() {
+	public double getNLCi() {
 		return NLCi;
 	}
-	public void setNLCi(float NlCi) {
+	public void setNLCi(double NlCi) {
 		NLCi = NlCi;
 	}
 	

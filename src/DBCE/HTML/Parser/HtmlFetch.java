@@ -48,7 +48,6 @@ public class HtmlFetch {
 				|| e.attr("class").toLowerCase().contains("date")
 				|| e.attr("class").toLowerCase().contains("copyright")
 				|| e.attr("class").toLowerCase().contains("caption")
-				|| e.attr("class").toLowerCase().contains("media")
 				|| e.attr("class").toLowerCase().contains("player")
 				|| e.attr("class").toLowerCase().contains("photo")
 				|| e.attr("class").toLowerCase().contains("option")

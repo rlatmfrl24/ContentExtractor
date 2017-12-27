@@ -2,7 +2,7 @@ package DBCE.HTML.Parser;
 
 import java.util.ArrayList;
 
-public class NoiseController {
+public class NoiseFilter {
 
 	private static final int MinWordsLine = 10;
 	private static final int MinWordsSentence = 5;
@@ -10,25 +10,21 @@ public class NoiseController {
 			"\\d{3}\\-\\d{4}\\-\\d{4}",
 			"\\d{2,3}\\-\\d{3,4}\\-\\d{4}",
 			"01(?:0|1[6-9])\\-(?:\\d{3}|\\d{4})\\-\\d{4}",
-			"[0-9a-zA-Z_\\-]+@[.0-9a-zA-Z_\\-]+",
-			"[0-9a-zA-Z_\\-]+@[0-9a-zA-Z_-]+(\\.[0-9a-zA-Z_\\-]+)*",
-			"[0-9a-zA-Z_\\-]+@[0-9a-zA-Z_\\-]+(\\.[0-9a-zA-Z_\\-]+){1,2}",
-			"[0-9a-zA-Z]([\\-.\\w]*[0-9a-zA-Z\\-_+])*@([0-9a-zA-Z][\\-\\w]*[0-9a-zA-Z]\\.)+[a-zA-Z]{2,9}",
+			"[A-Za-z0-9+_.-]+@(.+)",
 			"\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}",
 			"([0-9a-fA-F]{2}:){5}[0-9a-fA-F]{2}",
 			"\\d{6}\\-[1-4]\\d{6}",
 			"<!--(.|\n|\r)*-->",
-			"(file|gopher|news|nntp|telnet|https?|ftps?|sftp):\\/\\/([a-z0-9-]+\\.)+[a-z0-9]{2,4}.*$/",
 			"([^\\s]+(?=\\.(jpg|gif|png))\\.\\2)/",
 	};
 	
-
 	public String refineNoise(String content, String lang,  boolean Minwords, boolean FooterWords, boolean NoiseWord, boolean SpecialRegex){
 		ArrayList<String> lines = new ArrayList<>();
 		content = content.replaceAll("\\p{Z}", " ");
 		for(String s : content.split("(\n|\r)")){
 			lines.add(s);
 		}
+		
 		if(FooterWords){
 			boolean isFooter=false;
 			FooterWord fw = new FooterWord();
@@ -53,7 +49,6 @@ public class NoiseController {
 			for(int i=0; i<removeList.size(); i++){
 				lines.remove(removeList.get(i));
 			}
-
 		}
 		
 		if(NoiseWord){
@@ -74,6 +69,7 @@ public class NoiseController {
 			for(int i=0; i<removeList.size(); i++){
 				lines.remove(removeList.get(i));
 			}
+
 		}
 		
 		if(SpecialRegex){

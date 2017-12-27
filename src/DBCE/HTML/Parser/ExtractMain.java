@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
@@ -25,17 +26,18 @@ public class ExtractMain extends Thread {
 	public static void main(String[] args) throws Exception {
 		// TODO Auto-generated method stub
 //		Document doc = Jsoup.parse(HtmlFetch.getHttpHTML(url));
-		if (args.length < 2) {
+		if (args.length < 3) {
 			System.err.println(
-					"[Usage] java -jar Extractor.jar /input /output");
+					"[Usage] java -jar Extractor.jar lang_code /input /output");
 			System.exit(-1);
 		}
 		
+		String lang = args[0];
 		int sub_number = 0;
 		HashMap<String, String> path_Map = new HashMap<>();
 		ArrayList<String> input_path_list = new ArrayList<>();
 		
-		for(int i=0; i<args.length-1; i++){
+		for(int i=1; i<args.length-1; i++){
 			File ipfolder = new File(args[i]);
 			for(String str : ipfolder.list()){
 				input_path_list.add(args[i]+str);
@@ -54,10 +56,9 @@ public class ExtractMain extends Thread {
 		}
 		
 		try{
-			
 			for(int i=0; i<input_path_list.size(); i++){				
 				PageInfo pi = new PageInfo();
-				System.out.println(input_path_list.get(i));
+				//System.out.println(input_path_list.get(i));
 				Document doc = pi.setHTML(input_path_list.get(i));
 				pi.setTitle(doc.title());
 				pi.setUrl(doc.select("link[rel=\"canonical\"]").attr("href"));
@@ -65,11 +66,14 @@ public class ExtractMain extends Thread {
 				Date pdate = du.getPageDate();
 				if(pdate!=null) pi.setDate(pdate);
 				pi.setContent(performExtraction(doc));
-				NoiseController nc = new NoiseController();
-				pi.setContent(nc.refineNoise(pi.getContent(), "ko_kr", true, true, true, true));
+				if(lang.equals("ko_kr")){
+					NoiseFilter nc = new NoiseFilter();
+					pi.setContent(nc.refineNoise(pi.getContent(), lang, true, true, true, true));
+					//System.out.println("Apply Noise Filter["+lang+"]");
+				}
 				pi.AnalyzeContent();
 				String outpath = output_path+"/"+path_Map.get(input_path_list.get(i));
-				System.out.println(outpath);
+				//System.out.println(outpath);
 				outpath = outpath.substring(0, outpath.lastIndexOf("."))+".txt";
 				File rf = new File(outpath);
 				while(rf.exists()){
@@ -81,7 +85,7 @@ public class ExtractMain extends Thread {
 				bw.write(pi.getContent()+"\n");
 				bw.flush();
 				bw.close();
-				System.out.println(input_path_list.get(i)+" Done.");
+				System.out.println(input_path_list.get(i));
 			}
 			
 			System.out.println("Detect Duplicate files..");
@@ -103,7 +107,7 @@ public class ExtractMain extends Thread {
 		HashMap<Element, TNode> bodyMap = new HashMap<Element, TNode>();
 		doc = HtmlFetch.killNoise(doc);
 		Element bodyElement = doc.body();
-		float Threshold;
+		double Threshold;
 		
 		Metric m = new Metric(bodyElement);
 		
@@ -126,7 +130,7 @@ public class ExtractMain extends Thread {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(new File("F:/finderror.txt")));
 			for (Entry<Element, TNode> e : bodyMap.entrySet()) {
 				bw.write(e.getKey() + "\n");
-				bw.write("#Score:" +e.getValue().getTi()/e.getValue().getLTi());
+				bw.write("#Score:" +e.getValue().getTi()/e.getValue().getLTi()+"\n");
 				bw.write("#Score::" + e.getValue().getCTD() + ", " + e.getValue().getCi() + ", " + e.getValue().getTi()+ ", " + e.getValue().getLCi() + ", " + e.getValue().getLTi() + ", " + e.getValue().getNLCi()+ "\n");
 				bw.write("=====================================\n");
 			}

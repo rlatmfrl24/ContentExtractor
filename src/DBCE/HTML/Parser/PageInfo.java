@@ -1,7 +1,6 @@
 package DBCE.HTML.Parser;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map.Entry;
@@ -22,15 +21,6 @@ public class PageInfo {
 	private Document doc;
 	private Date date;
 	private HashMap<String, Integer> word_map = new HashMap<String, Integer>();
-	private String[] NoiseRegexSet = {
-			"^[0-9]((:|\\)|\\.)|[0-9]+(:|\\)|\\.))",
-			"<[^>]*>",
-			"\\{[^>]*\\}",
-			"^\\{\".*",
-			"�",
-			"<.*\b[^>]*>(.*?)</.*>"
-			//"^[0-9]+.*[0-9]",
-	};
 	
 	public String getTitle() {
 		return title;
@@ -46,9 +36,6 @@ public class PageInfo {
 		String process="";
 		for(String line : content.split("\n")){
 			String curline = line;
-			for(String nr : NoiseRegexSet){
-				curline = curline.replaceAll(nr, "");
-			}
 			process += curline+"\n";
 		}
 		this.content = process.trim();
@@ -93,13 +80,14 @@ public class PageInfo {
 			}
 		}
 		setContent_words(word_map.size());
-		
 		for(Entry<String, Integer> e : word_map.entrySet()){
 			if(e.getKey().length() > 6 && e.getValue() > 4){
 				setContent_keyword(getContent_keyword() +" #"+ e.getKey());
 			}
 		}
 	}
+	
+	
 	public Document getHTML() {
 		return doc;
 	}
@@ -137,12 +125,13 @@ public class PageInfo {
 			while ((nread = fis.read(buf)) > 0 && !detector.isDone()) {
 				detector.handleData(buf, 0, nread);
 			}
+			fis.close();
 			detector.dataEnd();
 			encoding = detector.getDetectedCharset();
 			if (encoding != null) {
-				System.out.println("Detected encoding = " + encoding);
+				//System.out.println("Detected encoding = " + encoding);
 			} else {
-				System.out.println("No encoding detected.");
+				//System.out.println("No encoding detected.");
 				encoding = "UTF-8";
 			}
 			detector.reset();
