@@ -1,4 +1,4 @@
-package DBCE.HTML.Parser;
+package DBCE.Utility;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -10,6 +10,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.jsoup.nodes.Document;
+
+import DBCE.HTML.Parser.PageInfo;
 
 public class DateUtil {
 

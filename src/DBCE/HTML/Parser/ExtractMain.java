@@ -1,13 +1,8 @@
 package DBCE.HTML.Parser;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -15,11 +10,13 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
-import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
-import DBCE.RepeatMap.RepeatLineMap;
+import DBCE.Filter.DuplicateDetector;
+import DBCE.Filter.NoiseFilter;
+import DBCE.Filter.RepeatLineMap;
+import DBCE.Utility.DateUtil;
 
 public class ExtractMain extends Thread {
 
@@ -56,32 +53,21 @@ public class ExtractMain extends Thread {
 		}
 		
 		try{
-			for(int i=0; i<input_path_list.size(); i++){				
-				PageInfo pi = new PageInfo();
-				//System.out.println(input_path_list.get(i));
-				Document doc = pi.setHTML(input_path_list.get(i));
-				pi.setTitle(doc.title());
-				pi.setUrl(doc.select("link[rel=\"canonical\"]").attr("href"));
-				DateUtil du = new DateUtil(pi);
-				Date pdate = du.getPageDate();
-				if(pdate!=null) pi.setDate(pdate);
-				pi.setContent(performExtraction(doc));
-				if(lang.equals("ko_kr")){
-					NoiseFilter nc = new NoiseFilter();
-					pi.setContent(nc.refineNoise(pi.getContent(), lang, true, true, true, true));
-					//System.out.println("Apply Noise Filter["+lang+"]");
-				}
+			for(int i=0; i<input_path_list.size(); i++){
+				
+				PageInfo pi = MakePageInformation(lang, input_path_list.get(i), true);
 				pi.AnalyzeContent();
+
 				String outpath = output_path+"/"+path_Map.get(input_path_list.get(i));
 				//System.out.println(outpath);
 				outpath = outpath.substring(0, outpath.lastIndexOf("."))+".txt";
-				File rf = new File(outpath);
-				while(rf.exists()){
-					rf = new File(outpath.replaceAll(".txt", "_"+sub_number+".txt"));
+				File of = new File(outpath);
+				while(of.exists()){
+					of = new File(outpath.replaceAll(".txt", "_"+sub_number+".txt"));
 					sub_number++;
 				}
 				sub_number=0;
-				BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(rf), StandardCharsets.UTF_8));
+				BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(of), StandardCharsets.UTF_8));
 				bw.write(pi.getContent()+"\n");
 				bw.flush();
 				bw.close();
@@ -91,7 +77,10 @@ public class ExtractMain extends Thread {
 			System.out.println("Detect Duplicate files..");
 			DuplicateDetector dd = new DuplicateDetector();
 			dd.FileDuplicationDetector(output_path);
-			refineByRepeatMap(output_path, output_path+"/refine/");
+			
+			System.out.println("Check repeated line..");
+			RepeatLineMap rlm = new RepeatLineMap();
+			rlm.refineByMap(output_path, output_path+"/refine/");
 			
 		}catch(Exception e){
 			e.printStackTrace();
@@ -103,6 +92,30 @@ public class ExtractMain extends Thread {
 		//TestUtil.showF1(output_path+"/", input_path.replaceAll("original", "gold"));
 		
 	}
+	
+	public static PageInfo MakePageInformation(String lang, String data_path, boolean NoiseFiltering) {
+		
+		PageInfo pi = new PageInfo();
+		//System.out.println(input_path_list.get(i));
+		Document doc = pi.setHTML(data_path);
+		pi.setTitle(doc.title());
+		pi.setUrl(doc.select("link[rel=\"canonical\"]").attr("href"));
+		DateUtil du = new DateUtil(pi);
+		Date pdate = du.getPageDate();
+		if(pdate!=null) pi.setDate(pdate);
+		pi.setContent(performExtraction(doc));
+
+		if(NoiseFiltering) {
+			if(lang.equals("ko_kr")){
+				NoiseFilter nc = new NoiseFilter();
+				pi.setContent(nc.refineNoise(pi.getContent(), lang, true, true, true, true));
+				//System.out.println("Apply Noise Filter["+lang+"]");
+			}
+		}
+
+		return pi;
+	}
+	
 	public static String performExtraction(Document doc){
 		HashMap<Element, TNode> bodyMap = new HashMap<Element, TNode>();
 		doc = HtmlFetch.killNoise(doc);
@@ -145,57 +158,7 @@ public class ExtractMain extends Thread {
 		
 		return m.getContent();
 	}
-	public static void refineByRepeatMap(String input, String output){
-		RepeatLineMap rlm = new RepeatLineMap();
-		String content = "";
-		String before = "";
-		File output_file = new File(output);
-		if(!output_file.exists()){
-			output_file.mkdirs();
-		}
-		
-		try{
-			File f = new File(input);
-			for (File rf : f.listFiles()) {
-				if (rf.isFile()) {
-					BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(rf), StandardCharsets.UTF_8));
-					StringBuilder str = new StringBuilder();
-					char[] c = new char[(int)rf.length()];
-					br.read(c);
-					str.append(c);
-					content = str.toString();
-					br.close();
-					System.out.println("=> Find Repeat Phreas By "+rf.getName());
-					rlm.UpdateMap(before, content);
-					before = content;
-					content = "";
-					br.close();
-				}
-			}
-			rlm.Resize(2);
-			System.out.println(rlm.getRepeatMap());
-			
-			for (File rf : f.listFiles()) {
-				if (rf.isFile()) {
-					BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(rf), StandardCharsets.UTF_8));
-					BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(output + rf.getName())), StandardCharsets.UTF_8));
-					StringBuilder str = new StringBuilder();
-					char[] c = new char[(int)rf.length()];
-					br.read(c);
-					str.append(c);
-					content = str.toString();
-					br.close();
-					System.out.println(rf.getName());
-					bw.write(rlm.refineByMap(content, true));
-					bw.flush();
-					bw.close();
-					content = "";
-				}
-			}
-		}catch(Exception e){
-			e.printStackTrace();
-		}
-	}
+	
 	public static void subDirList(String source){
 		File dir = new File(source); 
 		File[] fileList = dir.listFiles();

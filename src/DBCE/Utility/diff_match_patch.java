@@ -17,7 +17,7 @@
  * limitations under the License.
  */
 
-package DBCE.RepeatMap;
+package DBCE.Utility;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
