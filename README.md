@@ -1,3 +1,3 @@
-# Extract
+# HTML Content Extractor
 
-Current version : Extractor_1.0_release
+1. 

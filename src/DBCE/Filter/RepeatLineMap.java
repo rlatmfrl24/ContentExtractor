@@ -1,10 +1,11 @@
-package DBCE.RepeatMap;
+package DBCE.Filter;
 
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map.Entry;
 
-import DBCE.RepeatMap.diff_match_patch.Diff;
+import DBCE.Utility.diff_match_patch;
+import DBCE.Utility.diff_match_patch.Diff;
 public class RepeatLineMap {
 	private HashMap<String, Integer> RepeatMap = new HashMap<>();
 	private LinkedList<Diff> dlist;

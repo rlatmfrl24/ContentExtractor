@@ -1,4 +1,4 @@
-package DBCE.HTML.Parser;
+package DBCE.Filter;
 
 import java.io.File;
 import java.io.FileInputStream;
